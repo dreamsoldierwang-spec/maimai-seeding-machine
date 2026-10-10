@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>麦麦种草机 · 预览工作台</title>
+<style>
+  :root{
+    --red:#DA291C; --yellow:#FFC72C; --ink:#27251F; --bg:#F7F4EF;
+    --card:#FFFFFF; --line:#ECE6DC; --muted:#8A8378; --green:#2E7D32;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6; padding:24px;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  header{
+    background:linear-gradient(120deg,var(--red),#b71c1c); color:#fff;
+    border-radius:18px; padding:26px 30px; box-shadow:0 8px 24px rgba(218,41,28,.18);
+    position:relative; overflow:hidden;
+  }
+  header h1{font-size:26px;letter-spacing:.5px}
+  header p{opacity:.92;margin-top:6px;font-size:14px}
+  .badge{position:absolute;right:20px;top:20px;background:var(--yellow);color:#3a2e00;
+    font-size:12px;padding:6px 12px;border-radius:999px;font-weight:700}
+  .grid{display:grid;grid-template-columns:1fr 1.15fr;gap:20px;margin-top:20px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  .card h2{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .card h2::before{content:"";width:6px;height:18px;background:var(--red);border-radius:3px}
+  label{font-size:13px;color:var(--muted);display:block;margin:14px 0 6px;font-weight:600}
+  .seg{display:flex;gap:8px;flex-wrap:wrap}
+  .seg button{flex:1;min-width:80px;padding:9px 6px;border:1.5px solid var(--line);background:#fff;
+    border-radius:10px;cursor:pointer;font-size:13px;color:var(--ink);transition:.15s}
+  .seg button.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700}
+  select,input[type=text],textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);
+    border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+  textarea{height:150px;resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{padding:10px 16px;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;transition:.15s}
+  .btn-primary{background:var(--red);color:#fff}
+  .btn-primary:hover{background:#b71c1c}
+  .btn-ghost{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+  .btn-soft{background:var(--yellow);color:#3a2e00}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .out{white-space:pre-wrap;font-size:14px;background:var(--bg);border:1px dashed var(--line);
+    border-radius:12px;padding:16px;max-height:560px;overflow:auto}
+  .out h3{color:var(--red);font-size:15px;margin:14px 0 6px}
+  .out .tag{display:inline-block;background:#fff3d6;color:#8a6d00;border:1px solid #ffe08a;
+    padding:2px 9px;border-radius:999px;font-size:12px;margin:3px 4px 0 0}
+  .meta{font-size:12px;color:var(--muted);margin-top:10px}
+  .note{font-size:12px;color:var(--muted);background:#fff8e6;border:1px solid #ffe7a8;
+    border-radius:10px;padding:10px 12px;margin-top:14px;line-height:1.5}
+  footer{margin-top:24px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
+  .pill{display:inline-block;background:#eee;border-radius:999px;padding:2px 10px;margin:2px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">第三方创作辅助 · 非官方</div>
+    <h1>🍔 麦麦种草机 · 预览工作台</h1>
+    <p>把麦当劳 MCP 返回的真实数据，一键变成可发布的小红书 / 公众号 / 抖音 种草草稿。</p>
+  </header>
+
+  <div class="grid">
+    <!-- 左：控制区 -->
+    <div class="card">
+      <h2>① 选平台与角度</h2>
+      <label>目标平台</label>
+      <div class="seg" id="platform">
+        <button data-v="xhs" class="on">小红书</button>
+        <button data-v="wechat">公众号</button>
+        <button data-v="douyin">抖音</button>
+      </div>
+
+      <label>内容角度</label>
+      <select id="angle">
+        <option value="smart">智能（活动+券 全都要）</option>
+        <option value="save">省钱攻略</option>
+        <option value="fit">健身减脂</option>
+        <option value="fest">节日 · 1024 程序员节</option>
+        <option value="explore">附近探店</option>
+        <option value="new">新品测评</option>
+        <option value="kid">亲子家庭</option>
+        <option value="night">夜宵 / 加班补给</option>
+      </select>
+
+      <label>人设（可选）</label>
+      <input type="text" id="persona" placeholder="如：打工人 / 学生党 / 宝妈 / 程序员">
+
+      <label>② 粘贴麦当劳 MCP 返回的 JSON</label>
+      <textarea id="json" placeholder='把 WorkBuddy 调用 mcd-mcp 工具（如 campaign-calendar / available-coupons）后返回的内容粘贴到这里。也可点“载入示例”体验。'></textarea>
+
+      <div class="row">
+        <button class="btn btn-soft" id="loadSample">载入示例</button>
+        <button class="btn btn-primary" id="gen">生成草稿</button>
+        <button class="btn btn-ghost" id="clear">清空</button>
+      </div>
+      <div class="note">💡 数据完全在本地浏览器解析，不会上传。没有 Token 也能用「载入示例」体验完整流程。</div>
+    </div>
+
+    <!-- 右：输出区 -->
+    <div class="card">
+      <h2>③ 生成结果</h2>
+      <div class="row" style="margin-top:0">
+        <button class="btn btn-ghost" id="copy">复制全文</button>
+        <button class="btn btn-ghost" id="expMd">导出 .md</button>
+        <button class="btn btn-ghost" id="expJson">导出 .json</button>
+      </div>
+      <div class="out" id="out">👈 选择左侧平台与角度，粘贴 MCP 数据后点「生成草稿」。
+或先点「载入示例」看效果。</div>
+      <div class="meta" id="meta"></div>
+    </div>
+  </div>
+
+  <footer>
+    麦麦种草机 · Maimai Seeding Machine ｜ 2026 麦当劳程序员创意开发大赛参赛作品<br>
+    本工具为第三方创作辅助，与麦当劳无官方关联；所有数据须来自麦当劳 MCP 真实返回，缺数据处标注「以门店/活动页实际为准」。
+  </footer>
+</div>
+
+<script>
+/* ---------- 示例数据（mock，仅演示，非真实优惠） ---------- */
+const SAMPLE = {
+  "campaign-calendar": {
+    "month": "2026-10",
+    "campaigns": [
+      {"name":"1024 程序员节 · M-Code 主题活动","status":"进行中","start":"2026-10-24","end":"2026-10-26","type":"节日主题"},
+      {"name":"麦麦省 · 周一会员日","status":"进行中","start":"2026-10-01","end":"2026-10-31","type":"优惠"},
+      {"name":"金拱门早餐卡返场","status":"未来","start":"2026-11-01","end":"2026-11-30","type":"会员"}
+    ]
+  },
+  "available-coupons": {
+    "coupons": [
+      {"name":"巨无霸套餐券","threshold":"满30","discount":"减12","validTo":"2026-10-31"},
+      {"name":"麦辣鸡腿堡买一赠一","threshold":"无门槛","discount":"买1赠1","validTo":"2026-10-25"},
+      {"name":"拿铁咖啡半价券","threshold":"满15","discount":"5折","validTo":"2026-10-31"}
+    ]
+  },
+  "list-nutrition-foods": {
+    "foods": [
+      {"name":"板烧鸡腿堡","energy":430,"protein":28,"fat":19,"carb":34},
+      {"name":"玉米杯（中）","energy":110,"protein":4,"fat":1.5,"carb":22},
+      {"name":"鲜煮咖啡（中）","energy":5,"protein":0.3,"fat":0,"carb":0.5}
+    ]
+  },
+  "query-nearby-stores": {
+    "stores": [
+      {"name":"麦当劳(南京西路店)","distance":"320m","address":"南京西路 1188 号","modes":["堂食","外带","取餐柜","麦乐送"]},
+      {"name":"麦当劳(静安寺得来速)","distance":"1.2km","address":"常德路 1 号","modes":["得来速车道","外带","麦乐送"]}
+    ]
+  }
+};
+
+/* ---------- 状态 ---------- */
+let platform = "xhs";
+
+/* ---------- UI 绑定 ---------- */
+document.querySelectorAll('#platform button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('#platform button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); platform=b.dataset.v;
+  };
+});
+document.getElementById('loadSample').onclick=()=>{
+  document.getElementById('json').value = JSON.stringify(SAMPLE,null,2);
+};
+document.getElementById('clear').onclick=()=>{
+  document.getElementById('json').value='';
+  document.getElementById('out').textContent='已清空。';
+  document.getElementById('meta').textContent='';
+};
+document.getElementById('gen').onclick=generate;
+document.getElementById('copy').onclick=()=>{
+  const t=document.getElementById('out').innerText;
+  navigator.clipboard.writeText(t).then(()=>alert('已复制全文到剪贴板 ✅'));
+};
+document.getElementById('expMd').onclick=()=>download('maimai-种草草稿.md', document.getElementById('out').innerText, 'text/markdown');
+document.getElementById('expJson').onclick=()=>{
+  const data={platform, angle:document.getElementById('angle').value, draft:document.getElementById('out').innerText};
+  download('maimai-种草草稿.json', JSON.stringify(data,null,2), 'application/json');
+};
+
+/* ---------- 数据提取 ---------- */
+function extract(json){
+  const d={activities:[],coupons:[],foods:[],stores:[]};
+  if(json["campaign-calendar"]&&json["campaign-calendar"].campaigns) d.activities=json["campaign-calendar"].campaigns;
+  else if(Array.isArray(json.campaigns)) d.activities=json.campaigns;
+  else if(Array.isArray(json.activities)) d.activities=json.activities;
+  if(json["available-coupons"]&&json["available-coupons"].coupons) d.coupons=json["available-coupons"].coupons;
+  else if(Array.isArray(json.coupons)) d.coupons=json.coupons;
+  if(json["list-nutrition-foods"]&&json["list-nutrition-foods"].foods) d.foods=json["list-nutrition-foods"].foods;
+  else if(Array.isArray(json.foods)) d.foods=json.foods;
+  if(Array.isArray(json.stores)) d.stores=json.stores;
+  else if(json["query-nearby-stores"]&&Array.isArray(json["query-nearby-stores"].stores)) d.stores=json["query-nearby-stores"].stores;
+  return d;
+}
+function fmtDate(s){return (s||'').slice(5).replace(/-/,'/');}
+
+/* ---------- 生成入口 ---------- */
+function generate(){
+  const raw=document.getElementById('json').value.trim();
+  const angle=document.getElementById('angle').value;
+  const persona=document.getElementById('persona').value.trim()||'打工人';
+  let data={activities:[],coupons:[],foods:[],stores:[]};
+  if(raw){
+    try{ data=extract(JSON.parse(raw)); }
+    catch(e){ document.getElementById('out').textContent='❌ JSON 解析失败：'+e.message; return; }
+  }
+  let out='';
+  if(platform==='xhs') out=genXHS(data,angle,persona);
+  else if(platform==='wechat') out=genWechat(data,angle,persona);
+  else out=genDouyin(data,angle,persona);
+  document.getElementById('out').innerHTML=renderHTML(out);
+  document.getElementById('meta').textContent='平台：'+platName(platform)+' ｜ 角度：'+angleName(angle)+' ｜ 人设：'+persona+
+    ' ｜ 已用数据：活动'+data.activities.length+' 券'+data.coupons.length+' 营养'+data.foods.length+' 门店'+data.stores.length+' 条';
+}
+function platName(v){return {xhs:'小红书',wechat:'公众号',douyin:'抖音'}[v];}
+function angleName(v){return {smart:'智能',save:'省钱',fit:'健身减脂',fest:'节日1024',explore:'探店',new:'新品',kid:'亲子',night:'夜宵'}[v];}
+
+/* ---------- 小红书 ---------- */
+function genXHS(d,a,p){
+  const L=[];
+  let title='',open='',items=[],tips=[],tags=[],shots=[];
+  // 选取数据源
+  const act=(a==='smart'||a==='fest'||a==='new'||a==='kid')?d.activities.filter(x=>x.status!=='往期'):[];
+  const cps=(a==='smart'||a==='save'||a==='kid'||a==='night')?d.coupons:[];
+  const fds=(a==='fit')?d.foods:[];
+  const sts=(a==='explore')?d.stores:[];
+
+  if(a==='fit'){
+    title='🥗减脂期也能吃的麦当劳！高蛋白低卡清单（附热量）';
+    open='减脂期嘴馋又怕胖？麦当劳其实能吃得挺干净，'+p+'亲测这几样安排上不长肉。';
+    fds.slice(0,3).forEach(f=>items.push('• '+f.name+'：'+f.energy+' kcal ｜ 蛋白 '+f.protein+'g ｜ 脂肪 '+f.fat+'g'));
+    tips=['优先选烤制/鲜煮，避开油炸与含糖饮料','用玉米杯/沙拉换掉薯条，热量直接砍半','拿铁选无糖，咖啡因还能提神'];
+    tags=['#麦当劳减脂餐','#高蛋白低脂','#减脂期吃什么','#打工人午餐','#麦当劳隐藏吃法'];
+    shots=['封面：大字「减脂期麦当劳清单」+ 餐品图','内页：热量对比表','内页：低卡替换示意','结尾：互动卡「你最爱吃哪款？」'];
+  } else if(a==='fest'){
+    title='🔥1024 程序员节隐藏玩法：去麦当劳领限定周边了兄弟们';
+    open='别只会写代码了！1024 那几天麦当劳有 M-Code 主题活动，'+p+'带你去薅限定。';
+    act.slice(0,3).forEach(x=>items.push('• '+x.name+'：'+fmtDate(x.start)+'–'+fmtDate(x.end)+'（'+x.status+'）'));
+    tips=['先查可约城市/门店/场次再下单，热门场次手慢无','记得去自助点餐机找 1024 专属入口玩摩斯密码领小票','程序员 App 内完成 GitHub 认证可直接领券'];
+    tags=['#1024程序员节','#麦当劳MCode','#程序员浪漫','#限定周边','#周末去哪玩'];
+    shots=['封面：汉堡回车键梗图','内页：活动日历截图','内页：派对预约步骤','结尾：互动卡「你约到哪场？」'];
+  } else if(a==='explore'){
+    title='👀家附近麦当劳开了新花样？实地探了一波';
+    open=''+p+'楼下麦当劳悄悄升级了，取餐柜 + 得来速，体验直接拉满。';
+    sts.slice(0,3).forEach(s=>items.push('• '+s.name+'：'+s.distance+' ｜ '+s.address+' ｜ '+(s.modes||[]).join('/')));
+    tips=['取餐柜扫码 30 秒拿餐，高峰期不排队','得来速车道不下车取餐，带娃超省心','外送记得看可配送门店范围'];
+    tags=['#麦当劳探店','#取餐柜','#得来速','#本地生活','#打工人午餐'];
+    shots=['封面：门店外观+大字','内页：取餐柜实拍','内页：餐品图','结尾：互动卡「你家附近有吗？」'];
+  } else { // save / smart / kid / new / night → 券+活动
+    title='💰'+p+'的麦当劳省钱攻略：这波券我直接囤到月底';
+    open='又到饭点钱包空空？'+p+'的麦当劳省钱作业我抄好了，照着领就行。';
+    cps.slice(0,3).forEach(c=>items.push('• '+c.name+'：'+c.threshold+' ｜ '+c.discount+' ｜ 有效至 '+fmtDate(c.validTo)));
+    act.slice(0,2).forEach(x=>items.push('• 活动：'+x.name+'（'+fmtDate(x.start)+'–'+fmtDate(x.end)+'）'));
+    tips=['券可叠加门店活动，结算前先比价','周一会员日 + 券最划算','关注有效期，别让券过期'];
+    tags=['#麦当劳优惠券','#薅羊毛日记','#打工人午餐','#省钱攻略','#麦当劳隐藏吃法'];
+    shots=['封面：大字「省 X 元」+ 券截图','内页：券清单截图','内页：原价 vs 到手价对比','结尾：互动卡「评论区蹲你那边有没有」'];
+  }
+  if(items.length===0) items.push('• （未检测到对应 MCP 数据，建议先调用相关工具；以下以门店实际为准）');
+
+  L.push('【标题】'+title);
+  L.push('');
+  L.push('【正文】');
+  L.push(open);
+  L.push('');
+  L.push('📌 干货罗列：');
+  items.forEach(i=>L.push(i));
+  L.push('');
+  L.push('💡 实操 tips：');
+  tips.forEach((t,i)=>L.push((i+1)+'. '+t));
+  L.push('');
+  L.push('👇 互动：你们那边有这波吗？评论区蹲一个～收藏起来下次直接抄作业！');
+  L.push('');
+  L.push('【话题标签】 '+tags.join(' '));
+  L.push('');
+  L.push('【配图分镜 · 3:4】');
+  shots.forEach((s,i)=>L.push((i+1)+'. '+s));
+  L.push('');
+  L.push('— 据麦当劳 MCP 公开数据生成，以门店/活动页实际为准。');
+  return L.join('\n');
+}
+
+/* ---------- 公众号 ---------- */
+function genWechat(d,a,p){
+  const L=[];
+  const cps=d.coupons, act=d.activities, fds=d.foods;
+  L.push('【标题备选】');
+  L.push('1. 麦当劳这个月悄悄上线了好几个活动，第 3 个'+p+'必看');
+  L.push('2. 实测：用对这几张券，麦当劳午餐能省一半');
+  L.push('3. 1024 那天，我带着朋友把麦当劳玩明白了');
+  L.push('');
+  L.push('【导语】');
+  L.push('每到月底，办公室的午饭话题永远绕不开「今天吃什么」。这一次，我们用麦当劳 MCP 的真实数据，把能薅的福利一次性盘清楚。');
+  L.push('');
+  L.push('【正文结构】');
+  L.push('一、本月有哪些活动？');
+  (act.length?act:d.activities).slice(0,3).forEach(x=>L.push('  · '+x.name+'：'+fmtDate(x.start)+'–'+fmtDate(x.end)+'（'+x.status+'）'));
+  if(!act.length) L.push('  · （调用 campaign-calendar 获取当月真实活动）');
+  L.push('');
+  L.push('二、这几张券最值得领');
+  (cps.length?cps:d.coupons).slice(0,3).forEach(c=>L.push('  · '+c.name+'：'+c.threshold+' ｜ '+c.discount+' ｜ 有效至 '+fmtDate(c.validTo)));
+  if(!cps.length) L.push('  · （调用 available-coupons 获取可领券清单）');
+  L.push('');
+  L.push('三、实操建议（分步骤）');
+  L.push('  1. 先领券再点单，结算前比价；');
+  L.push('  2. 叠加门店活动（如周一会员日）最划算；');
+  L.push('  3. 关注有效期，别让券白白过期。');
+  L.push('');
+  if(fds.length){
+    L.push('四、减脂党也能吃');
+    fds.slice(0,3).forEach(f=>L.push('  · '+f.name+'：'+f.energy+' kcal ｜ 蛋白 '+f.protein+'g'));
+  }
+  L.push('');
+  L.push('【排版建议】（配合 gzh-design）');
+  L.push('· 章节自动编号，关键词下划线标记；');
+  L.push('· 引言卡片放「一句话总结」；');
+  L.push('· 券/活动用表格呈现，直观清晰。');
+  L.push('');
+  L.push('【结尾引导】点赞 / 在看 / 留言你所在的城市有没有这波福利。');
+  L.push('');
+  L.push('— 据麦当劳 MCP 公开数据整理，以官方活动页为准。');
+  return L.join('\n');
+}
+
+/* ---------- 抖音 ---------- */
+function genDouyin(d,a,p){
+  const L=[];
+  L.push('【3 秒开场钩子】');
+  L.push('别再原价买麦当劳了！'+p+'教你三招直接省一半。');
+  L.push('');
+  L.push('【分镜脚本】');
+  L.push('镜1 ｜ 主播手持手机券页 ｜ 「别再原价买麦当劳了！」 ｜ 3s ｜ 轻快卡点');
+  const cps=d.coupons;
+  if(cps.length){
+    cps.slice(0,3).forEach((c,i)=>{
+      L.push('镜'+(i+2)+' ｜ 屏幕录屏券页 ｜ 「'+c.name+'，'+c.threshold+'，'+c.discount+'」 ｜ 5s ｜ 同上');
+    });
+  } else {
+    L.push('镜2 ｜ 屏幕录屏活动页 ｜ 「这月活动先领券再点单」 ｜ 5s ｜ 同上');
+  }
+  L.push('镜末 ｜ 真人出镜总结 ｜ 「记住这几点，下次直接抄」 ｜ 4s ｜ 渐弱');
+  L.push('镜尾 ｜ 结尾引导 ｜ 「点赞收藏，饿了就翻出来」 ｜ 3s ｜ 收尾音效');
+  L.push('');
+  L.push('【字幕要点】关键词放大加粗（省 X 元 / 仅限 X 日）；屏幕文字与口播一致。');
+  L.push('');
+  L.push('— 据麦当劳 MCP 公开数据，以门店实际为准。');
+  return L.join('\n');
+}
+
+/* ---------- 渲染（标签变色） ---------- */
+function renderHTML(txt){
+  return txt
+    .replace(/【话题标签】 (.*)/, m=>'【话题标签】\n'+m.replace('【话题标签】 ','').split(' ').map(t=>t.trim()?('<span class="tag">'+t+'</span>'):'').join(''))
+    .replace(/\n/g,'<br>');
+}
+function download(name,content,type){
+  const blob=new Blob([content],{type});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
